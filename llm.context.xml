@@ -1,0 +1,39 @@
+<project name="erpnext-domain-logic">
+    <system_context>
+        Computational domain engine representing the accounting, manufacturing, and inventory systems.
+        Target Stack: rust_decimal = "=1.42.0" (with maths enabled), SurrealDB 3.1.3, Chrono 0.4.
+    </system_context>
+
+    <directory_structure>
+        erpnext-domain/
+        ├── Cargo.toml
+        └── crates/
+            ├── erp-accounting/      # Double-entry postings, composite rollups
+            │   └── src/
+            │       ├── lib.rs
+            │       ├── posting.rs
+            │       └── balance_sheet.rs
+            ├── erp-inventory/       # FIFO stock ledger, stock transfers
+            │   └── src/
+            │       ├── lib.rs
+            │       ├── stock_ledger.rs
+            │       └── transfers.rs
+            └── erp-manufacturing/   # Recursive BOM cost rollups, MRP demand/supply pipelines
+                └── src/
+                    ├── lib.rs
+                    ├── bom.rs
+                    └── mrp.rs
+    </directory_structure>
+
+    <key_invariants>
+        <invariant name="Decimal Precision Constraint">
+            All arithmetic for balances, tax rates, routing costs, and values must use high-precision rust_decimal::Decimal to prevent float drift.
+        </invariant>
+        <invariant name="SurrealDB RecordId API">
+            SurrealDB v3 uses surrealdb::types::RecordId (re-exported from surrealdb-types). The RecordId struct does not implement Display; use .to_sql() from surrealdb::types::ToSql to insert it into SQL statements.
+        </invariant>
+        <invariant name="BOM Traversal Complexity">
+            Recursive BOM costing must expand Phantom BOM nodes inline. Routing costs must be summed recursively alongside components.
+        </invariant>
+    </key_invariants>
+</project>
