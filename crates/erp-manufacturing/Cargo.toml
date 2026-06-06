@@ -1,0 +1,11 @@
+[package]
+name = "erp-manufacturing"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rust_decimal = { version = "=1.42.0", features = ["maths", "serde"] }
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+surrealdb = { version = "3.0.5", features = ["protocol-ws", "rustls"] }
+tokio = { version = "1.52.3", features = ["full"] }
