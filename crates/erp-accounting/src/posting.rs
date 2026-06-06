@@ -1,6 +1,6 @@
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use surrealdb::Thing as RecordId;
+use surrealdb::types::{RecordId, ToSql};
 use crate::LedgerError;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -16,6 +16,7 @@ pub struct GLEntry {
 /// $$\sum \text{Debits} - \sum \text{Credits} = 0$$
 ///
 /// Algorithmic Complexity: $O(N)$ validation loop.
+/// pub fn validate_and_compile_transaction(entries: &[GLEntry]) -> Result<(), LedgerError> {
 pub fn validate_and_compile_transaction(entries: &[GLEntry]) -> Result<(), LedgerError> {
     let mut sum_debits = Decimal::ZERO;
     let mut sum_credits = Decimal::ZERO;
@@ -38,7 +39,7 @@ pub fn generate_posting_queries(entries: &[GLEntry]) -> Vec<String> {
     let mut queries = vec!["BEGIN TRANSACTION;".to_string()];
 
     for entry in entries {
-        let account_str = format!("{}", entry.account);
+        let account_str = entry.account.to_sql();
         // Insert General Ledger Entry
         queries.push(format!(
             "CREATE gl_entry CONTENT {{ account: {}, debit: {}, credit: {} }};",
@@ -64,12 +65,12 @@ mod tests {
     fn test_valid_transaction() {
         let entries = vec![
             GLEntry {
-                account: RecordId::from_string("account:asset").unwrap(),
+                account: RecordId::parse_simple("account:asset").unwrap(),
                 debit: Decimal::new(100, 0),
                 credit: Decimal::ZERO,
             },
             GLEntry {
-                account: RecordId::from_string("account:revenue").unwrap(),
+                account: RecordId::parse_simple("account:revenue").unwrap(),
                 debit: Decimal::ZERO,
                 credit: Decimal::new(100, 0),
             },
@@ -81,12 +82,12 @@ mod tests {
     fn test_invalid_transaction() {
         let entries = vec![
             GLEntry {
-                account: RecordId::from_string("account:asset").unwrap(),
+                account: RecordId::parse_simple("account:asset").unwrap(),
                 debit: Decimal::new(100, 0),
                 credit: Decimal::ZERO,
             },
             GLEntry {
-                account: RecordId::from_string("account:revenue").unwrap(),
+                account: RecordId::parse_simple("account:revenue").unwrap(),
                 debit: Decimal::ZERO,
                 credit: Decimal::new(99, 0),
             },
