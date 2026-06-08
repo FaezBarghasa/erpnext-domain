@@ -4,4 +4,10 @@ members = [
     "crates/erp-accounting",
     "crates/erp-inventory",
     "crates/erp-manufacturing",
+    "crates/erp-hr",
+    "crates/erp-learning",
+    "crates/erp-crm",
+    "crates/erp-support",
+    "crates/erp-lending",
+    "crates/erp-trade",
 ]
