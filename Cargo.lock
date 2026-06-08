@@ -968,6 +968,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "erp-crm"
+version = "0.1.0"
+dependencies = [
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "erp-hr"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "erp-inventory"
 version = "0.1.0"
 dependencies = [
@@ -977,6 +998,26 @@ dependencies = [
  "surrealdb",
  "thiserror 1.0.69",
  "uuid",
+]
+
+[[package]]
+name = "erp-learning"
+version = "0.1.0"
+dependencies = [
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "erp-lending"
+version = "0.1.0"
+dependencies = [
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -991,13 +1032,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "erp-support"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "erp-trade"
+version = "0.1.0"
+dependencies = [
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "errno"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3294,6 +3356,16 @@ dependencies = [
  "serde",
  "serde_json",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "rust_decimal_macros"
+version = "1.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74a5a6f027e892c7a035c6fddb50435a1fbf5a734ffc0c2a9fed4d0221440519"
+dependencies = [
+ "quote",
+ "syn 2.0.117",
 ]
 
 [[package]]
