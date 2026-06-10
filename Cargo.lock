@@ -1024,6 +1024,7 @@ dependencies = [
 name = "erp-manufacturing"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "rust_decimal",
  "rust_decimal_macros",
  "serde",
@@ -1036,11 +1037,16 @@ dependencies = [
 name = "erp-support"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "chrono",
+ "frappe-storage",
+ "futures",
  "rust_decimal",
  "rust_decimal_macros",
  "serde",
  "thiserror 1.0.69",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]
@@ -1166,6 +1172,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "frappe-storage"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "hex",
+ "sha2",
+ "thiserror 1.0.69",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]
