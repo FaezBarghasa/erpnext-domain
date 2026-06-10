@@ -37,49 +37,35 @@ pub fn evaluate_pricing_rules(
 
     for rule in rules {
         // 1. Check item identifier match
-        if let Some(ref rule_item) = rule.item_code {
-            if rule_item != &item.id {
-                continue;
-            }
+        if rule.item_code.as_ref().is_some_and(|code| code != &item.id) {
+            continue;
         }
 
         // 2. Check item group match
-        if let Some(ref rule_group) = rule.item_group {
-            if rule_group != &item.item_group {
-                continue;
-            }
+        if rule.item_group.as_ref().is_some_and(|group| group != &item.item_group) {
+            continue;
         }
 
         // 3. Check customer class match
-        if let Some(ref rule_class) = rule.customer_class {
-            if Some(rule_class.as_str()) != customer_class {
-                continue;
-            }
+        if rule.customer_class.as_ref().is_some_and(|class| Some(class.as_str()) != customer_class) {
+            continue;
         }
 
         // 4. Check quantity limits
         if item.qty < rule.min_qty {
             continue;
         }
-        if let Some(max_qty) = rule.max_qty {
-            if item.qty > max_qty {
-                continue;
-            }
+        if rule.max_qty.is_some_and(|max| item.qty > max) {
+            continue;
         }
 
         // 5. Check promotion validity dates
-        if let Some(valid_from) = rule.valid_from {
-            if let Some(tx_date) = transaction_date {
-                if tx_date < valid_from {
-                    continue;
-                }
+        if let Some(tx_date) = transaction_date {
+            if rule.valid_from.is_some_and(|from| tx_date < from) {
+                continue;
             }
-        }
-        if let Some(valid_upto) = rule.valid_upto {
-            if let Some(tx_date) = transaction_date {
-                if tx_date > valid_upto {
-                    continue;
-                }
+            if rule.valid_upto.is_some_and(|upto| tx_date > upto) {
+                continue;
             }
         }
 

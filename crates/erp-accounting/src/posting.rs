@@ -35,7 +35,9 @@ pub fn validate_and_compile_transaction(entries: &[GLEntry]) -> Result<(), Ledge
 }
 
 /// Generates SurrealQL queries to record the transaction and update target account balances.
-pub fn generate_posting_queries(entries: &[GLEntry]) -> Vec<String> {
+pub fn generate_posting_queries(entries: &[GLEntry]) -> Result<Vec<String>, LedgerError> {
+    validate_and_compile_transaction(entries)?;
+
     let mut queries = vec!["BEGIN TRANSACTION;".to_string()];
 
     for entry in entries {
@@ -54,7 +56,7 @@ pub fn generate_posting_queries(entries: &[GLEntry]) -> Vec<String> {
     }
 
     queries.push("COMMIT TRANSACTION;".to_string());
-    queries
+    Ok(queries)
 }
 
 #[cfg(test)]
@@ -93,5 +95,36 @@ mod tests {
             },
         ];
         assert!(validate_and_compile_transaction(&entries).is_err());
+    }
+
+    #[test]
+    fn test_generate_posting_queries() {
+        let entries = vec![
+            GLEntry {
+                account: RecordId::parse_simple("account:cash").unwrap(),
+                debit: Decimal::new(200, 0),
+                credit: Decimal::ZERO,
+            },
+            GLEntry {
+                account: RecordId::parse_simple("account:equity").unwrap(),
+                debit: Decimal::ZERO,
+                credit: Decimal::new(200, 0),
+            },
+        ];
+        
+        let queries = generate_posting_queries(&entries).unwrap();
+        assert_eq!(queries.len(), 6); // BEGIN, CREATE, UPDATE, CREATE, UPDATE, COMMIT
+        assert_eq!(queries[0], "BEGIN TRANSACTION;");
+        assert_eq!(queries[5], "COMMIT TRANSACTION;");
+
+        // Now test unbalanced
+        let bad_entries = vec![
+            GLEntry {
+                account: RecordId::parse_simple("account:cash").unwrap(),
+                debit: Decimal::new(200, 0),
+                credit: Decimal::ZERO,
+            },
+        ];
+        assert!(generate_posting_queries(&bad_entries).is_err());
     }
 }
