@@ -20,6 +20,16 @@ graph TD
         BOM[Recursive BOM Costing] -->|Phantom Node Expansion| TotalCost[Manufactured Component Cost]
         MRP[Tokio Parallel MRP Pipeline] -->|Shortage Calculations| SupplyOrders[MRP Planning Results]
     end
+
+    subgraph HumanResources [erp-hr]
+        Payroll[Dynamic Salary Calculator] -->|Rhai Scripting| SalarySlips[Salary Slip Generation]
+        Tax[Progressive Tax Engine] -->|Slab Rules| Deductions[Tax Deductions]
+    end
+
+    subgraph CRM [erp-crm]
+        Scoring[Lead Scoring Engine] -->|Weighting Rules| LeadScore[Lead Quality Score]
+        Pipeline[Sales Pipeline Funnel] -->|State Transitions| DealStage[Deal Stage Tracking]
+    end
 ```
 
 ---
@@ -33,7 +43,7 @@ graph TD
 - **Recursive Chart of Accounts Rollup (`balance_sheet.rs`)**: Aggregates ledger account balances across composite tree nodes recursively to calculate trial balances and consolidated balance sheets.
 
 ### 2. High-Performance Inventory (`erp-inventory`)
-- **FIFO Valuation Queue (`stock_ledger.rs`)**: Implements First-In, First-Out valuation strategies using sorted timestamp queues. Issues deduct stock quantities sequentially from older items first, computing dynamic Cost of Goods Sold (COGS) based on historical rates.
+- **FIFO Valuation Queue (`stock_ledger.rs`)**: Implements First-In, First-Out valuation strategies using sorted timestamp queues. Issues deduct stock quantities from older items first, computing dynamic Cost of Goods Sold (COGS) based on historical rates.
 - **Graph-Relational Stock Transfers (`transfers.rs`)**: Constructs transactional stock movement records, compiling SurrealQL queries that link transactions to warehouses via graph relations (`shipped_from`, `received_at`) to preserve inventory change history.
 
 ### 3. Bills of Materials & MRP (`erp-manufacturing`)
@@ -41,8 +51,17 @@ graph TD
   $$\text{TotalParentCost} = \sum \left( \text{Qty}_{\text{Component}} \times \text{Rate}_{\text{Component}} \right) + \sum \text{RoutingCost}$$
 - **Tokio Parallel MRP Pipeline (`mrp.rs`)**: Spawns concurrent tasks using Tokio channels to scan order demands against warehouse stock balances to compute shortages.
 
+### 4. Human Resources (`erp-hr`)
+- **Dynamic Salary Calculation (`payroll.rs`)**: Computes salary slips using the Rhai scripting engine to dynamically evaluate earning/deduction formulas. Supports complex, user-defined salary structures.
+- **Progressive Tax Engine (`payroll.rs`)**: Calculates income tax based on configurable, multi-layered tax slabs.
+- **Payroll Batch Posting (`payroll.rs`)**: Generates balanced double-entry GL postings for an entire payroll batch, ensuring accounting consistency.
+
+### 5. Customer Relationship Management (`erp-crm`)
+- **Lead Scoring Engine (`lead_scoring.rs`)**: Assigns scores to leads based on configurable rules and weights to prioritize high-value prospects.
+- **Sales Pipeline Management (`pipeline.rs`)**: Tracks deal stages and funnel progression.
+
 ---
 
 ## High-Precision Math Guarantee
 
-To prevent float drift errors common in business applications, all currency values, tax calculations, routing costs, inventory rates, and quantities are modeled using high-precision decimal representation via `rust_decimal::Decimal` pinned to `=1.42.0` with `maths` feature flags enabled.
+To prevent float drift errors in business applications, all currency values, tax calculations, routing costs, inventory rates, and quantities are modeled using high-precision decimal representation via `rust_decimal::Decimal` pinned to `=1.42.0` with `maths` feature flags enabled.

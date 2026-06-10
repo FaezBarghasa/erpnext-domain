@@ -18,11 +18,21 @@
             │       ├── lib.rs
             │       ├── stock_ledger.rs
             │       └── transfers.rs
-            └── erp-manufacturing/   # Recursive BOM cost rollups, MRP demand/supply pipelines
-                └── src/
-                    ├── lib.rs
-                    ├── bom.rs
-                    └── mrp.rs
+            ├── erp-manufacturing/   # Recursive BOM cost rollups, MRP demand/supply pipelines
+            │   └── src/
+            │       ├── lib.rs
+            │       ├── bom.rs
+            │       └── mrp.rs
+            ├── erp-hr/              # Payroll, attendance, and HR functions
+            │   └── src/
+            │       ├── lib.rs
+            │       ├── payroll.rs
+            │       └── attendance.rs
+            ├── erp-crm/             # Lead scoring and sales pipeline
+            │   └── src/
+            │       ├── lib.rs
+            │       ├── lead_scoring.rs
+            │       └── pipeline.rs
     </directory_structure>
 
     <key_invariants>
@@ -34,6 +44,9 @@
         </invariant>
         <invariant name="BOM Traversal Complexity">
             Recursive BOM costing must expand Phantom BOM nodes inline. Routing costs must be summed recursively alongside components.
+        </invariant>
+        <invariant name="Dynamic Payroll Formulas">
+            Salary components are evaluated dynamically using the Rhai scripting engine. Formulas must be valid Rhai expressions.
         </invariant>
     </key_invariants>
 </project>

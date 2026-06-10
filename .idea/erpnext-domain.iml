@@ -2,6 +2,15 @@
 <module type="EMPTY_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-accounting/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-crm/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-hr/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-inventory/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-learning/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-lending/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-manufacturing/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-support/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/erp-trade/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
