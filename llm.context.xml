@@ -1,38 +1,56 @@
 <project name="erpnext-domain-logic">
     <system_context>
-        Computational domain engine representing the accounting, manufacturing, and inventory systems.
-        Target Stack: rust_decimal = "=1.42.0" (with maths enabled), SurrealDB 3.1.3, Chrono 0.4.
+        Computational domain engine representing the accounting, manufacturing, inventory, hr, lending, support, crm, trade, and learning systems.
+        Target Stack: rust_decimal = "=1.42.0" (with maths enabled), SurrealDB 3.0.5, Chrono 0.4.
     </system_context>
 
     <directory_structure>
         erpnext-domain/
         ├── Cargo.toml
         └── crates/
-            ├── erp-accounting/      # Double-entry postings, composite rollups
+            ├── erp-accounting/      # Double-entry postings, balance sheet generation
             │   └── src/
             │       ├── lib.rs
             │       ├── posting.rs
             │       └── balance_sheet.rs
-            ├── erp-inventory/       # FIFO stock ledger, stock transfers
+            ├── erp-inventory/       # FIFO/Moving average stock ledger, valuation corrections, stock transfers
             │   └── src/
             │       ├── lib.rs
             │       ├── stock_ledger.rs
-            │       └── transfers.rs
+            │       ├── transfers.rs
+            │       └── fifo_valuation.rs
             ├── erp-manufacturing/   # Recursive BOM cost rollups, MRP demand/supply pipelines
             │   └── src/
             │       ├── lib.rs
             │       ├── bom.rs
             │       └── mrp.rs
-            ├── erp-hr/              # Payroll, attendance, and HR functions
+            ├── erp-hr/              # Payroll, progressive tax engine, attendance
             │   └── src/
             │       ├── lib.rs
             │       ├── payroll.rs
             │       └── attendance.rs
-            ├── erp-crm/             # Lead scoring and sales pipeline
+            ├── erp-crm/             # Lead scoring and sales pipeline stage tracking
             │   └── src/
             │       ├── lib.rs
             │       ├── lead_scoring.rs
             │       └── pipeline.rs
+            ├── erp-support/         # Service Level Agreement (SLA) status tracking
+            │   └── src/
+            │       ├── lib.rs
+            │       └── sla.rs
+            ├── erp-lending/         # Loan amortization calculations (EMI, Reducing Balance)
+            │   └── src/
+            │       ├── lib.rs
+            │       └── amortization.rs
+            ├── erp-trade/           # Customer pricing rules and taxation templates
+            │   └── src/
+            │       ├── lib.rs
+            │       ├── pricing_rules.rs
+            │       └── tax_templates.rs
+            └── erp-learning/        # Training and learning progress tracking
+                └── src/
+                    ├── lib.rs
+                    └── learning_progress.rs
     </directory_structure>
 
     <key_invariants>
@@ -40,13 +58,16 @@
             All arithmetic for balances, tax rates, routing costs, and values must use high-precision rust_decimal::Decimal to prevent float drift.
         </invariant>
         <invariant name="SurrealDB RecordId API">
-            SurrealDB v3 uses surrealdb::types::RecordId (re-exported from surrealdb-types). The RecordId struct does not implement Display; use .to_sql() from surrealdb::types::ToSql to insert it into SQL statements.
+            SurrealDB v3 uses surrealdb::types::RecordId. The RecordId struct does not implement Display; use .to_sql() to insert it into SQL statements.
         </invariant>
         <invariant name="BOM Traversal Complexity">
             Recursive BOM costing must expand Phantom BOM nodes inline. Routing costs must be summed recursively alongside components.
         </invariant>
         <invariant name="Dynamic Payroll Formulas">
             Salary components are evaluated dynamically using the Rhai scripting engine. Formulas must be valid Rhai expressions.
+        </invariant>
+        <invariant name="Backdated Valuation Correction">
+            Valuation updates downstream of backdated stock entries must re-sort downstream items chronologically and recalculate COGS / stock queue.
         </invariant>
     </key_invariants>
 </project>

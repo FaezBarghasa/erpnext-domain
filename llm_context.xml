@@ -4,9 +4,9 @@
         <name>erpnext-domain</name>
         <description>Domain logic and ERP modules for the Rust ERPNext rewrite.</description>
     </project>
-    <architecture_notes>This workspace contains the business logic and modules like accounting, inventory, manufacturing, etc., utilizing SurrealDB for multi-model queries.</architecture_notes>
+    <architecture_notes>This workspace contains the business logic modules (accounting, inventory, manufacturing, lending, HR, CRM, support, trade, learning) utilizing high-precision math via rust_decimal and SurrealDB graph transactions.</architecture_notes>
     <coding_standards>
         <standard>No placeholder blocks or `todo!` stubs are permitted.</standard>
-        <standard>Utilize specific data typing.</standard>
+        <standard>Utilize specific data typing, relying heavily on `rust_decimal::Decimal` for precision math.</standard>
     </coding_standards>
 </llm_context>
