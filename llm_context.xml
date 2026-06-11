@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<llm_context>
+    <project>
+        <name>erpnext-domain</name>
+        <description>Domain logic and ERP modules for the Rust ERPNext rewrite.</description>
+    </project>
+    <architecture_notes>This workspace contains the business logic and modules like accounting, inventory, manufacturing, etc., utilizing SurrealDB for multi-model queries.</architecture_notes>
+    <coding_standards>
+        <standard>No placeholder blocks or `todo!` stubs are permitted.</standard>
+        <standard>Utilize specific data typing.</standard>
+    </coding_standards>
+</llm_context>
