@@ -1,6 +1,8 @@
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap, HashSet};
+use surrealdb::Surreal;
+use surrealdb::Connection;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AccountNode {
@@ -87,6 +89,66 @@ pub fn build_account_tree(records: &[AccountRecord]) -> Vec<AccountNode> {
     }
 
     roots
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct BalanceSheetReport {
+    pub assets: Decimal,
+    pub liabilities: Decimal,
+    pub equity: Decimal,
+    pub balance_tree: BTreeMap<String, Decimal>,
+}
+
+impl BalanceSheetReport {
+    /// Fetches the CoA tree structure from SurrealDB and rolls up balance sheet totals.
+    pub async fn fetch_and_compute<C: Connection>(
+        db: &Surreal<C>,
+        ns: &str,
+        database: &str,
+        _period_start: &str,
+        _period_end: &str,
+    ) -> Result<Self, crate::LedgerError> {
+        db.use_ns(ns).use_db(database).await.map_err(|e| crate::LedgerError::Database(e.to_string()))?;
+
+        // Query converting RecordIds to Strings in the DB for clean deserialization
+        let query = "SELECT string(id) as id, string(parent) as parent, name, balance FROM account;";
+        let mut response = db.query(query).await.map_err(|e| crate::LedgerError::Database(e.to_string()))?;
+        
+        let raw_records: Vec<serde_json::Value> = response.take(0).map_err(|e| crate::LedgerError::Database(e.to_string()))?;
+        let records: Vec<AccountRecord> = serde_json::from_value(serde_json::Value::Array(raw_records))
+            .map_err(|e| crate::LedgerError::Database(e.to_string()))?;
+
+        let roots = build_account_tree(&records);
+
+        let mut ledger_data = BTreeMap::new();
+        for rec in &records {
+            ledger_data.insert(rec.id.clone(), rec.balance);
+        }
+
+        let mut balance_tree = BTreeMap::new();
+        let mut assets_total = Decimal::ZERO;
+        let mut liabilities_total = Decimal::ZERO;
+        let mut equity_total = Decimal::ZERO;
+
+        for root in &roots {
+            let root_total = calculate_composite_balance(root, &ledger_data, &mut balance_tree);
+            let root_id_lower = root.account_id.to_lowercase();
+            if root_id_lower.contains("asset") {
+                assets_total += root_total;
+            } else if root_id_lower.contains("liability") {
+                liabilities_total += root_total;
+            } else if root_id_lower.contains("equity") {
+                equity_total += root_total;
+            }
+        }
+
+        Ok(BalanceSheetReport {
+            assets: assets_total,
+            liabilities: liabilities_total,
+            equity: equity_total,
+            balance_tree,
+        })
+    }
 }
 
 #[cfg(test)]

@@ -146,6 +146,8 @@ pub fn post_payroll_batch(
     bank_account: RecordId,
     expense_account: RecordId,
     tax_account: RecordId,
+    voucher_type: &str,
+    voucher_no: &str,
 ) -> Result<Vec<GLEntry>, PayrollError> {
     let mut total_gross = Decimal::ZERO;
     let mut total_deductions = Decimal::ZERO;
@@ -163,16 +165,25 @@ pub fn post_payroll_batch(
             account: expense_account,
             debit: total_gross,
             credit: Decimal::ZERO,
+            voucher_type: voucher_type.to_string(),
+            voucher_no: voucher_no.to_string(),
+            cost_center: None,
         },
         GLEntry {
             account: tax_account,
             debit: Decimal::ZERO,
             credit: total_deductions,
+            voucher_type: voucher_type.to_string(),
+            voucher_no: voucher_no.to_string(),
+            cost_center: None,
         },
         GLEntry {
             account: bank_account,
             debit: Decimal::ZERO,
             credit: total_net,
+            voucher_type: voucher_type.to_string(),
+            voucher_no: voucher_no.to_string(),
+            cost_center: None,
         },
     ];
 
@@ -287,6 +298,8 @@ mod tests {
             bank_acc,
             expense_acc,
             tax_acc,
+            "Journal Entry",
+            "JV-2026-001",
         ).unwrap();
 
         assert_eq!(postings.len(), 3);
